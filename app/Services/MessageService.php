@@ -30,9 +30,29 @@ class MessageService
             'body' => $body,
         ]);
 
+        $message->load('sender');
         broadcast(new MessageSent($message))->toOthers();
 
         return $message;
+    }
+
+    public function markAllAsReadForUser(User $user): void
+    {
+        Message::where('receiver_id', $user->id)
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
+    }
+
+    public function markOneAsRead(Message $message, User $user): bool
+    {
+        if ($message->receiver_id !== $user->id) {
+            return false;
+        }
+        if ($message->read_at !== null) {
+            return true;
+        }
+        $message->update(['read_at' => now()]);
+        return true;
     }
 }
 

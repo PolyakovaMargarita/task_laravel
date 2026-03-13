@@ -25,22 +25,35 @@
                         </div>
 
                         <div class="md:col-span-2">
-                            <h2 class="font-semibold mb-2">Сообщения для вас</h2>
+                            <div class="flex items-center justify-between mb-2">
+                                <h2 class="font-semibold">Сообщения для вас</h2>
+                                <button type="button" id="mark-all-read-btn" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium">
+                                    Прочитать все
+                                </button>
+                            </div>
 
-                            <ul id="messages" class="space-y-2 mb-4 max-h-80 overflow-y-auto border border-gray-200 rounded p-2 bg-gray-50">
-                                @foreach($receivedMessages as $msg)
-                                    <li class="bg-white rounded px-3 py-2 shadow-sm">
-                                        <div class="text-sm text-gray-700">
-                                            <strong>{{ $msg->sender->name }}:</strong> {{ $msg->body }}
-                                        </div>
-                                        <div class="text-xs text-gray-400 text-right">
-                                            {{ $msg->created_at }}
-                                        </div>
-                                    </li>
-                                @endforeach
-                            </ul>
+                            <div id="messages-container" class="mb-4">
+                                <h3 class="text-sm font-medium text-gray-700 mb-1">Новые</h3>
+                                <ul id="messages-new" class="space-y-2 max-h-48 overflow-y-auto border border-gray-200 rounded p-2 bg-gray-50">
+                                    @forelse($unreadMessages as $msg)
+                                        <li class="msg-item rounded px-3 py-2 shadow-sm bg-indigo-50 border-l-4 border-indigo-500 cursor-pointer" data-message-id="{{ $msg->id }}">
+                                            <div class="flex-1 min-w-0">
+                                                <div class="text-sm text-gray-700">
+                                                    <span class="msg-unread-label text-xs font-semibold text-indigo-600 uppercase mr-1">Новое</span>
+                                                    <strong>{{ $msg->sender->name }}:</strong> {{ $msg->body }}
+                                                </div>
+                                                <div class="text-xs text-gray-400 text-right">
+                                                    <time class="msg-time" datetime="{{ $msg->created_at->utc()->toIso8601String() }}"></time>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    @empty
+                                        <li id="messages-new-empty" class="text-sm text-gray-500 py-2">Нет новых сообщений</li>
+                                    @endforelse
+                                </ul>
+                            </div>
 
-                            <form id="message-form" class="space-y-2">
+                            <form id="message-form" class="space-y-2 mb-4">
                                 @csrf
                                 <input type="hidden" name="receiver_id" id="receiver_id">
                                 <div>
@@ -63,6 +76,24 @@
                                     </button>
                                 </div>
                             </form>
+
+                            <div>
+                                <h3 class="text-sm font-medium text-gray-700 mb-1">История</h3>
+                                <ul id="messages-history" class="space-y-2 max-h-80 overflow-y-auto border border-gray-200 rounded p-2 bg-gray-50">
+                                    @foreach($historyMessages as $msg)
+                                        <li class="msg-item rounded px-3 py-2 shadow-sm bg-white" data-message-id="{{ $msg->id }}">
+                                            <div class="flex-1 min-w-0">
+                                                <div class="text-sm text-gray-700">
+                                                    <strong>{{ $msg->sender->name }}:</strong> {{ $msg->body }}
+                                                </div>
+                                                <div class="text-xs text-gray-400 text-right">
+                                                    <time class="msg-time" datetime="{{ $msg->created_at->utc()->toIso8601String() }}"></time>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>

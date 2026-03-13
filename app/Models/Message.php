@@ -23,4 +23,16 @@ class Message extends Model
     {
         return $this->belongsTo(User::class, 'receiver_id');
     }
+
+    public function isUnread(): bool
+    {
+        return $this->read_at === null;
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'read_at' => 'datetime',
+        ];
+    }
 }
