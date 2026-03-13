@@ -17,10 +17,9 @@ RUN apt-get update && apt-get install -y \
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 COPY . /var/www/html
+COPY docker/entrypoint.sh /entrypoint.sh
+RUN sed -i 's/\r$//' /entrypoint.sh && chmod +x /entrypoint.sh
 
-RUN composer install --no-interaction --prefer-dist --optimize-autoloader
-
-RUN php artisan key:generate || true
-
+ENTRYPOINT ["/entrypoint.sh"]
 CMD ["php-fpm"]
 

@@ -24,7 +24,27 @@ class StoreMessageRequest extends FormRequest
     {
         return [
             'receiver_id' => ['required', 'exists:users,id'],
-            'body' => ['required', 'string', 'max:1000'],
+            'body' => [
+                'required',
+                'string',
+                function (string $attribute, mixed $value, \Closure $fail): void {
+                    if (mb_strlen($value) > 1000) {
+                        $fail('Сообщение не должно быть длиннее 1000 символов.');
+                    }
+                },
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'body.required' => 'Введите текст сообщения.',
+            'receiver_id.required' => 'Выберите получателя.',
+            'receiver_id.exists' => 'Выбранный пользователь не найден.',
         ];
     }
 }
